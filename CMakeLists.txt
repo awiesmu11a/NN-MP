@@ -1,6 +1,6 @@
 
 cmake_minimum_required(VERSION 2.8)
-project(NN-ML)
+project(NN-MP)
 
 # Make edits in test.cpp so that I can test any network with random examples and then set BUILD_EXPERIMENTAL here
 
@@ -114,39 +114,39 @@ endif()
 
 
 #----------------------------------Not sure what this is-----------------------------------------------------------
-cuda_add_library(NN-ML SHARED ${inferenceSources})
+cuda_add_library(NN-MP SHARED ${inferenceSources})
 
 # transfer all headers to the include directory--------------------------------------------------------------------
-file(MAKE_DIRECTORY ${PROJECT_INCLUDE_DIR}/NN-ML)
+file(MAKE_DIRECTORY ${PROJECT_INCLUDE_DIR}/NN-MP)
 
 foreach(include ${inferenceIncludes})
 	message("-- Copying ${include}")
-	configure_file(${include} ${PROJECT_INCLUDE_DIR}/NN-ML COPYONLY)
+	configure_file(${include} ${PROJECT_INCLUDE_DIR}/NN-MP COPYONLY)
 endforeach()
 
 execute_process( COMMAND "$CMAKE_COMMAND" "-E" "create_symlink" "${PROJECT_SOURCE_DIR}/networks/models" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
 
 # set linker options--------------------------------------------------------------
-target_link_libraries(NN-ML jetson-utils nvinfer nvinfer_plugin nvcaffe_parser)
+target_link_libraries(NN-MP jetson-utils nvinfer nvinfer_plugin nvcaffe_parser)
 
 #---------------------------------------
 if(CUDA_VERSION_MAJOR GREATER 9)
-	target_link_libraries(NN-ML nvonnxparser)
+	target_link_libraries(NN-MP nvonnxparser)
 endif()
 
 if(HAS_OPENCV) 
    message("-- linking CNN-test with OpenCV " ${OpenCV_VERSION})
-   target_link_libraries(NN-ML opencv_core opencv_calib3d)
+   target_link_libraries(NN-MP opencv_core opencv_calib3d)
 endif()
 
 if(HAS_VPI) 
    message("-- linking CNN-test with VPI " ${VPI_VERSION})
-   target_link_libraries(NN-ML vpi)
+   target_link_libraries(NN-MP vpi)
 endif()
 
 # install includes
 foreach(include ${inferenceIncludes})
-    install(FILES "${include}" DESTINATION include/NN-ML)
+    install(FILES "${include}" DESTINATION include/NN-MP)
 endforeach()
 
 # install symlink to networks and images
@@ -154,13 +154,13 @@ endforeach()
 # install(CODE "execute_process( COMMAND ${CMAKE_COMMAND} -E create_symlink ${PROJECT_SOURCE_DIR}/data/images ${CMAKE_INSTALL_PREFIX}/bin/images )" )
 
 # install the shared library
-install(TARGETS NN-ML DESTINATION lib EXPORT NN-MLConfig)
-cuda_add_executable(mymodel ${PROJECT_SOURCE_DIR}/NN-ML/test.cpp)
-target_link_libraries(mymodel NN-ML)
+install(TARGETS NN-MP DESTINATION lib EXPORT NN-MPConfig)
+cuda_add_executable(mymodel ${PROJECT_SOURCE_DIR}/NN-MP/test.cpp)
+target_link_libraries(mymodel NN-MP)
 install(TARGETS mymodel DESTINATION bin)
 
 # install the cmake project, for importing
-install(EXPORT NN-MLConfig DESTINATION share/NN-ML/cmake)
+install(EXPORT NN-MPConfig DESTINATION share/NN-MP/cmake)
 
 # run ldconfig after installing
 install(CODE "execute_process( COMMAND ldconfig )")

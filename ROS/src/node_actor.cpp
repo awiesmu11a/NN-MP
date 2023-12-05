@@ -14,8 +14,6 @@ std::vector<float32> feature_vector;
 float acc = 0;
 float steering_angle = 0;
 
-cudaMalloc((void**)&input, 576 * sizeof(float32_t));
-
 void features_callback(const std_msgs::Float32MultiArray::ConstPtr& msg)
 {
     feature_vector = msg->data;
@@ -25,6 +23,8 @@ void features_callback(const std_msgs::Float32MultiArray::ConstPtr& msg)
     {
         return;
     }
+
+    cudaMalloc((void**)&input, 576 * sizeof(float32_t));
 
     cudaMemcpy(net.mInputs[0].CUDA, input, 576 * sizeof(float32_t), cudaMemcpyDeviceToDevice);
 
@@ -37,6 +37,8 @@ void features_callback(const std_msgs::Float32MultiArray::ConstPtr& msg)
     output = net.mOutputs[0].CPU;
     acc = output[0];
     steering_angle = output[1];
+
+    cudaFree(input);
 
     return;
 }
@@ -59,15 +61,16 @@ int main(int argc, char **argv)
 
     std::string network = "actor_network";
     std::string prototxt_path = "";
-    std::string model_path = "/home/nvidia/NN-ML/networks/models/actor.onnx";
+    std::string model_path = "/home/nvidia/NN-MP/networks/models/actor.onnx";
 
-    std::string input_blob = FCN_NET_DEFAULT_INPUT;
-    std::string output_blob = FCN_NET_DEFAULT_OUTPUT;
-    const Dims& features = Dims2(576, 1);
+    std::string input_blob = "features";
+    std::string output_blob = "throttle"
+    const Dims2& features = Dims2(576, 1);
+    uint32_t maxBatchSize = 1;
 
-    net = FCN::Create(prototxt_path, model_path, input_blob, features, output_blob, maxBatchSize = 1);
+    net = FCN::Create(prototxt_path, model_path, features, maxBatchSize, input_blob, output_blob);
 
-    std::string features_sub = "ExtractedFeatures";
+    std::string features_sub = "/ExtractedFeatures";
     std::string control = "low_level/ackermann_cmd_mux/input/teleop";
     std::string control_sub = "low_level/ackermann_cmd_mux/output";
 
@@ -79,4 +82,10 @@ int main(int argc, char **argv)
     ros::spin();
 
     // free resources from CUDA
+
+    delete net;
+    delete input;
+    delete output;
+
+    return 0;
 }

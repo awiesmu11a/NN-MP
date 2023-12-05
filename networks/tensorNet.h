@@ -61,6 +61,8 @@ typedef nvinfer1::Dims3 Dims3;
 #define DIMS_H(x) x.h
 #define DIMS_W(x) x.w
 
+typedef nvinfer1::Dims2 Dims2;
+
 #ifndef NV_TENSORRT_MAJOR
 #define NV_TENSORRT_MAJOR 1
 #define NV_TENSORRT_MINOR 0

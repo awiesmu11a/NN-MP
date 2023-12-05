@@ -13,14 +13,18 @@
 #include "tensorNet.h"
 #include "FCN.h"
 
+// Order of queue could be different
+
 FCN* net = NULL;
 
 std::vector<float32> rel_goal;
-stc::vector<float32> image_features;
+std::vector<float32> image_features;
 std::vector<float32> states;
 
 std::queue<float32> car_states;
-std::queue<float32> temp;
+
+float32_t* temp = NULL;
+size_t state_buffer = 12;
 
 std::vector<float32> goal;
 
@@ -69,7 +73,10 @@ void state_feat_extrac( const ackermann::AckermannDriveStamped::ConstPtr& msg )
         car_states.push(steering_angle);
     }
 
-    cudaMemcpy(net.mInputs[0].CUDA, car_states, 12 * sizeof(float32), cudaMemcpyHostToDevice);
+    temp = new float32_t[state_buffer];
+    std::copy(car_states.begin(), car_states.end(), temp);
+
+    cudaMemcpy(net.mInputs[0].CUDA, temp, 12 * sizeof(float32), cudaMemcpyHostToDevice);
 
     if ( !net->Process() )
     {
@@ -94,6 +101,8 @@ void state_feat_extrac( const ackermann::AckermannDriveStamped::ConstPtr& msg )
 
     feat_pub.publish(feat);
 
+    free(temp);
+
     return;
 
 
@@ -116,9 +125,9 @@ void odom_feat_extrac( const nav_msgs::Odometry::ConstPtr& msg )
     rel_goal_vec[0] = rel_goal[0];
     rel_goal_vec[1] = rel_goal[1];
 
-    float32 roll = atan2(2 * (q4 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2));
-    float32 pitch = asin(2 * (q4 * q2 - q3 * q1));
-    float32 yaw = atan2(2 * (q4 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3));
+    roll = atan2(2 * (q4 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2));
+    pitch = asin(2 * (q4 * q2 - q3 * q1));
+    yaw = atan2(2 * (q4 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3));
 
     rot_mat[0][0] = cos(yaw);
     rot_mat[0][1] = sin(yaw);
@@ -145,13 +154,11 @@ int main(int argc, char **argv)
 
     std::string network = "State_Feat_Extractor";
     std::string prototxt_path = "";
-    std::string model_path = "/home/nvidia/NN-ML/networks/models/state_fcn.onnx";
+    std::string model_path = "/home/nvidia/NN-MP/networks/models/state_fcn.onnx";
 
-    std::string input_blob_state = FCN_NET_DEFAULT_INPUT;
-    std::string output_blob_state = FCN_NET_DEFAULT_OUTPUT;
     const Dims2& states_input_dim = Dims2(12, 1);
 
-    net = FCN::Create(prototxt_path, model_path, input_blob_state, states_input_dim, output_blob_state, maxBatchSize = 1);
+    net = FCN::Create(prototxt_path, model_path, states_input_dim);
 
     std::string odom_sub = "/vesc/odom";
     std::string cmd_sub = "low_level/ackermann_cmd_mux/output"
@@ -167,5 +174,10 @@ int main(int argc, char **argv)
     ros::spin();
 
     // free resources from CUDA
+
+    delete net;
+    delete temp;
+
+    return 0;
     
 }

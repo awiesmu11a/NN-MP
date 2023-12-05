@@ -1,11 +1,9 @@
 
-#ifndef __ROS_IMAGE_CONVERTER_H__
-#define __ROS_IMAGE_CONVERTER_H__
 
-#include <cv_bridge/cv_bridge.h>
+#ifndef __TEST_IMAGE_CONVERTER_H__
+#define __TEST_IMAGE_CONVERTER_H__
+
 #include <opencv2/opencv.hpp>
-
-#include <sensor_msgs/Image.h>
 
 class imageConverter
 {
@@ -17,14 +15,14 @@ class imageConverter
 
         void Free();
 
-        bool Convert( const sensor_msgs::ImageConstPtr& input );
+        bool Convert( const cv::Mat &input );
 
-        bool Resize ( uint8_t width, uint8_t height, const sensor_msgs::ImageConstPtr& input );
+        bool Resize ( uint8_t width, uint8_t height, const cv::Mat &input );
 
-        bool cudaAssign( uint8_t width, uint8_t height, const sensor_msgs::ImageConstPtr& input );
+        bool cudaAssign( uint8_t width, uint8_t height, const cv::Mat &input );
     
     private:
-
+    
             size_t mInputSize;
     
             float32_t* mOutputCPU;
