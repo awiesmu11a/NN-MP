@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(NN-MP)
 
-# Make edits in test.cpp so that I can test any network with random examples and then set BUILD_EXPERIMENTAL here
+# For now BUILD_EXPERIMENTAL not set
 
 # setup build flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-write-strings -Wno-deprecated-declarations")	# -std=c++14 
@@ -155,9 +155,11 @@ endforeach()
 
 # install the shared library
 install(TARGETS NN-MP DESTINATION lib EXPORT NN-MPConfig)
-cuda_add_executable(mymodel ${PROJECT_SOURCE_DIR}/NN-MP/test.cpp)
-target_link_libraries(mymodel NN-MP)
-install(TARGETS mymodel DESTINATION bin)
+
+cuda_add_executable(test_model ${PROJECT_SOURCE_DIR}/NN-MP/test.cpp)
+target_link_libraries(test_model NN-MP)
+
+install(TARGETS test_model DESTINATION bin)
 
 # install the cmake project, for importing
 install(EXPORT NN-MPConfig DESTINATION share/NN-MP/cmake)
