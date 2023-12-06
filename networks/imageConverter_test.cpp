@@ -48,26 +48,26 @@ void imageConverter::Free()
 
 bool imageConverter::Convert( const cv::Mat &input )
 {
-    if ( !input )
+    if ( !input.empty() )
     {
-        sprintf("Invalid image input");
+        printf("Invalid image input");
         return false;
     }
 
     mInputCPU = input.data;
 
-    if ( input->width == req_width && input->height == req_height )
+    if ( input.cols == req_width && input.rows == req_height )
     {
-        sprintf("Image size is as required so no conversion needed");
+        printf("Image size is as required so no conversion needed");
 
-        std::memcpy(mOutputCPU, mInputCPU, imageFormatSize(IMAGE_GRAY8, input->width, input->height));
+        std::memcpy(mOutputCPU, mInputCPU, imageFormatSize(IMAGE_GRAY8, input.cols, input.rows));
 
         cudaAllocMapped( (void**)&mInputCPU, (void**)&mInputGPU,
-                        imageFormatSize(IMAGE_GRAY8, input->width, input->height) );
+                        imageFormatSize(IMAGE_GRAY8, input.cols, input.rows) );
         cudaAllocMapped( (void**)&mOutputCPU, (void**)&mOutputGPU,
-                        imageFormatSize(IMAGE_GRAY8, input->width, input->height) );
+                        imageFormatSize(IMAGE_GRAY8, input.cols, input.rows) );
         
-        mInputSize = imageFormatSize(IMAGE_GRAY8, input->width, input->height);
+        mInputSize = imageFormatSize(IMAGE_GRAY8, input.cols, input.rows);
 
         return true;
 
@@ -77,7 +77,7 @@ bool imageConverter::Convert( const cv::Mat &input )
 
     if ( !Resize( req_width, req_height, input ) )
     {
-        sprintf("Image size is not as required and resizing failed");
+        printf("Image size is not as required and resizing failed");
         return false;
     }
 
@@ -99,7 +99,7 @@ bool imageConverter::Resize( uint8_t width, uint8_t height, const cv::Mat &input
 
 bool imageConverter::cudaAssign( uint8_t width, uint8_t height, const cv::Mat &input )
 {
-    const size_t input_size = imageFormatSize( IMAGE_GRAY8, input->width, input->height );
+    const size_t input_size = imageFormatSize( IMAGE_GRAY8, input.cols, input.rows );
     const size_t output_size = imageFormatSize( IMAGE_GRAY8, width, height );
 
     if( input_size != mInputSize )
@@ -116,9 +116,6 @@ bool imageConverter::cudaAssign( uint8_t width, uint8_t height, const cv::Mat &i
 
         mInputSize = input_size;
     }
-
-    input_size.clear();
-    output_size.clear();
 
     return true;
 }

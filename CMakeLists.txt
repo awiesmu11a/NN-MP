@@ -105,8 +105,11 @@ include_directories(${PROJECT_INCLUDE_DIR} ${PROJECT_INCLUDE_DIR}/jetson-utils)
 include_directories(/usr/include/gstreamer-1.0 /usr/lib/${CMAKE_SYSTEM_PROCESSOR}/gstreamer-1.0/include /usr/include/glib-2.0 /usr/include/libxml2 /usr/lib/${CMAKE_SYSTEM_PROCESSOR}/glib-2.0/include/)
 
 #-----------------------------------------------Change the paths accordingly------------------------------------------
-file(GLOB inferenceSources networks/*.cpp)
-file(GLOB inferenceIncludes networks/*.h)
+# file(GLOB inferenceSources networks/*.cpp)
+# file(GLOB inferenceIncludes networks/*.h)
+
+file(GLOB inferenceSources networks/CNN.cpp networks/imageConverter_test.cpp networks/randInt8Calibrator.cpp networks/tensorNet.cpp networks/test.cpp)
+file(GLOB inferenceIncludes networks/CNN.h networks/imageConverter_test.h networks/randInt8Calibrator.h networks/tensorNet.h)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
 	link_directories(/usr/lib/aarch64-linux-gnu/tegra)

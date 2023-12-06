@@ -33,6 +33,6 @@ class imageConverter
             
             uint8_t req_height;
             uint8_t req_width;
-}
+};
 
 #endif

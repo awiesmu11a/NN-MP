@@ -8,7 +8,7 @@
 
 #include "imageConverter_test.h"
 #include "CNN.h"
-#include "FCN.h"
+//#include "FCN.h"
 
 // modify image converter to fit the openCV format
 // change the format of the input in header file for FCN
@@ -17,7 +17,7 @@
 
 bool CNN_test(const char* input) 
 {
-    imageConverter* input_cvt = new imageConverter( uint8_t width = 64, uint8_t height = 64 );
+    imageConverter* input_cvt = new imageConverter( 64, 64 );
 
     cv::Mat image = cv::imread(input, cv::IMREAD_GRAYSCALE);
     
@@ -61,7 +61,7 @@ bool CNN_test(const char* input)
 
     return true;
 }
-
+/*
 std::vector<std::vector<float>> extract_csv(const char* input)
 {
     std::ifstream file(input);
@@ -127,7 +127,7 @@ bool FCN_test(const char* input)
 
     return true;
 }
-
+*/
 int main (int argc, char** argv)
 {
     const char* input;
@@ -154,7 +154,7 @@ int main (int argc, char** argv)
         }
 
     }
-
+/*
     if (argv[2] == "-v")
     {
         input = argv[1];
@@ -165,7 +165,7 @@ int main (int argc, char** argv)
             return 0;
         }
     }
-
+*/
     delete[] input;
 
     return 0;
