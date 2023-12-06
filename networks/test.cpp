@@ -32,13 +32,13 @@ bool CNN_test(const char* input)
 
     CNN* net = CNN::Create( prototxt_path, model_path );
 
-    cudaMalloc( &net.mInputs[0].CUDA, input_cvt.mInputSize * 4 );
+    cudaMalloc( &net->GetInputPtr(0), input_cvt->GetInputSize() * 4 );
 
-    size_t offset = input_cvt.mInputSize;
+    size_t offset = input_cvt->GetInputSize();
 
     for( int i = 0; i < 4; i++ )
     {
-        cudaMemcpy( net.mInputs[0].CUDA + offset * i, input_cvt.mOutputGPU, input_cvt.mInputSize, cudaMemcpyDeviceToDevice );
+        cudaMemcpy( net->GetInputPtr(0) + offset * i, input_cvt->GetOutputGPU(), input_cvt->GetInputSize(), cudaMemcpyDeviceToDevice );
     }
 
     if( !net->Process() )
@@ -47,7 +47,7 @@ bool CNN_test(const char* input)
         return false;
     }
 
-    float* output = net.mOutputs[0].CPU;
+    float* output = net->GetOutputPtr(0);
     printf("Got a feature vector of size %zu", output.size());
 
     delete net;
@@ -55,9 +55,6 @@ bool CNN_test(const char* input)
     delete[] prototxt_path;
     delete[] model_path;
     delete output;
-
-    image.release();
-    offset.release();
 
     return true;
 }
@@ -106,9 +103,9 @@ bool FCN_test(const char* input)
 
     FCN* net = FCN::Create( prototxt_path, model_path, input_dim );
 
-    cudaMalloc( &net.mInputs[0].CUDA, input_size );
+    cudaMalloc( &net->GetInputPtr(0), input_size );
 
-    cudaMemcpy( net.mInputs[0].CUDA, data, input_size, cudaMemcpyHostToDevice );
+    cudaMemcpy( net->GetInputPtr(0), data, input_size, cudaMemcpyHostToDevice );
 
     if( !net->Process() )
     {
