@@ -139,7 +139,7 @@ endif()
 
 if(HAS_OPENCV) 
    message("-- linking CNN-test with OpenCV " ${OpenCV_VERSION})
-   target_link_libraries(NN-MP opencv_core opencv_calib3d)
+   target_link_libraries(NN-MP opencv_core opencv_calib3d opencv_imgcodecs)
 endif()
 
 if(HAS_VPI) 

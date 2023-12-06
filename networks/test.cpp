@@ -32,8 +32,6 @@ bool CNN_test(const char* input)
 
     CNN* net = CNN::Create( prototxt_path, model_path );
 
-    cudaMalloc( &net->GetInputPtr(0), input_cvt->GetInputSize() * 4 );
-
     size_t offset = input_cvt->GetInputSize();
 
     for( int i = 0; i < 4; i++ )
@@ -47,14 +45,12 @@ bool CNN_test(const char* input)
         return false;
     }
 
-    float* output = net->GetOutputPtr(0);
-    printf("Got a feature vector of size %zu", output.size());
+    printf("Got a feature vector of size %u", net->GetOutputSize(0));
 
     delete net;
     delete input_cvt;
     delete[] prototxt_path;
     delete[] model_path;
-    delete output;
 
     return true;
 }
