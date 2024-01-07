@@ -22,7 +22,6 @@ CNN* CNN::Create( const char* prototxt, const char* model, uint32_t maxBatchSize
 
     net->LoadNetwork( prototxt, model, NULL, input_blob, input_dim, outputs, maxBatchSize, 
                         precision, device, allowGPUFallback);
-    outputs.clear();
 
     return net;
 }

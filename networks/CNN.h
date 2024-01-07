@@ -13,8 +13,8 @@ class CNN : public tensorNet
 {
 public:
 
-    static CNN* Create( const char* prototxt_path, const char* model_path, uint32_t maxBatchSize = 4,
-                        const Dims3& input_dim= Dims3(1, 64, 64), const char* input_blob = IMGFEAT_NET_DEFAULT_INPUT,
+    static CNN* Create( const char* prototxt_path, const char* model_path, uint32_t maxBatchSize = 1,
+                        const Dims3& input_dim= Dims3(4, 64, 64), const char* input_blob = IMGFEAT_NET_DEFAULT_INPUT,
                         const char* output = IMGFEAT_NET_DEFAULT_OUTPUT, precisionType precision = TYPE_FP32, 
                         deviceType device = DEVICE_GPU, bool allowGPUFallback = true );
 

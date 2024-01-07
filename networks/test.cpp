@@ -8,12 +8,8 @@
 
 #include "imageConverter_test.h"
 #include "CNN.h"
-//#include "FCN.h"
+#include "FCN.h"
 
-// modify image converter to fit the openCV format
-// change the format of the input in header file for FCN
-// Current file only for Grayscale images
-// Write the script such that we test for batchsize 4 (use the same image)
 
 bool CNN_test(const char* input) 
 {
@@ -54,7 +50,7 @@ bool CNN_test(const char* input)
 
     return true;
 }
-/*
+
 std::vector<std::vector<float>> extract_csv(const char* input)
 {
     std::ifstream file(input);
@@ -109,8 +105,7 @@ bool FCN_test(const char* input)
         return false;
     }
 
-    float* output = net.mOutputs[0].CPU;
-    printf("Got a feature vector of size %zu", output.size());
+    printf("Got a feature vector of size %u", net->GetOutputSize(0));
 
     delete net;
     delete[] prototxt_path;
@@ -120,7 +115,7 @@ bool FCN_test(const char* input)
 
     return true;
 }
-*/
+
 int main (int argc, char** argv)
 {
     const char* input;
@@ -142,23 +137,21 @@ int main (int argc, char** argv)
         if ( !CNN_test(input) )
         {
             printf("Failed to process CNN");
-            delete[] input;
             return 0;
         }
 
     }
-/*
+
     if (argv[2] == "-v")
     {
         input = argv[1];
         if ( !FCN_test(input) )
         {
             printf("Failed to process FCN");
-            delete[] input;
             return 0;
         }
     }
-*/
+
     delete[] input;
 
     return 0;
