@@ -87,15 +87,13 @@ std::vector<std::vector<float>> extract_csv(const char* input)
 bool FCN_test(const char* input) 
 {
     std::vector<std::vector<float>> data = extract_csv(input);
-    const Dims2& input_dim = Dims2(data.size(), data[0].size());
+    const Dims3& input_dim = Dims3(1, data.size(), data[0].size());
     uint8_t input_size = data.size() * data[0].size() * sizeof(float);
 
     const char* prototxt_path = "";
     const char* model_path = "./models/FCN.onnx";
 
     FCN* net = FCN::Create( prototxt_path, model_path, input_dim );
-
-    cudaMalloc( &net->GetInputPtr(0), input_size );
 
     cudaMemcpy( net->GetInputPtr(0), data, input_size, cudaMemcpyHostToDevice );
 
@@ -110,7 +108,6 @@ bool FCN_test(const char* input)
     delete net;
     delete[] prototxt_path;
     delete[] model_path;
-    delete output;
     data.clear();
 
     return true;

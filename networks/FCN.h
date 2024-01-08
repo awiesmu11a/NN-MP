@@ -13,7 +13,7 @@ class FCN : public tensorNet
 public:
 
     static FCN* Create(const char* prototxt_path, const char* model_path, 
-                        const Dims2& input_dim = Dims2(12, 1), uint32_t maxBatchSize = 1,
+                        const Dims3& input_dim = Dims3(1, 12, 1), uint32_t maxBatchSize = 1,
                         const char* input_blob=FCN_NET_DEFAULT_INPUT, const char* output_blob = FCN_NET_DEFAULT_OUTPUT,
                         precisionType precision=TYPE_FP32, deviceType device = DEVICE_GPU, bool allowGPUFallback = true);
     

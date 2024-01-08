@@ -26,11 +26,11 @@ float32_t* get_output( std::queue<float32_t*> &input )
     std::queue<float32_t*> temp_input = input;
     temp = NULL;
 
-    for (in i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++)
     {
         temp = temp_input.pop();
         offset = i * 64 * 64 * sizeof(float32_t);
-        cudaMemcpy(net.mInputs[0].CUDA + offset, temp, 64 * 64 * sizeof(float32_t), cudaMemcpyDeviceToDevice);
+        cudaMemcpy(net->GetInputPtr(0) + offset, temp, 64 * 64 * sizeof(float32_t), cudaMemcpyDeviceToDevice);
         free(temp);
     }
 
@@ -40,7 +40,9 @@ float32_t* get_output( std::queue<float32_t*> &input )
         return;
     }
 
-    return net.mOutputs[0].CPU;    
+    delete temp_input;
+
+    return net->GetOutputPtr(0);
 }
 
 void depth_feat_extrac(const sensor_msgs::ImageConstPtr msg)
@@ -51,16 +53,15 @@ void depth_feat_extrac(const sensor_msgs::ImageConstPtr msg)
         return;
     }
 
-    // Add the input to the std::queue
     if ( input_queue.size() < 4 )
     {
-        input_queue.push(input_cvt.mOutputGPU);
+        input_queue.push(input_cvt->GetOutputGPU());
         return;
     }
     else
     {
         input_queue.pop();
-        input_queue.push(input_cvt.mOutputGPU);
+        input_queue.push(input_cvt->GetOutputGPU());
     }
 
     output_features = get_output(input_queue);
@@ -87,21 +88,15 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "ImageFeatureExtractor")
     ros::NodeHandle n;
 
-    std::string network = "CNN";
     std::string prototxt_path = "";
     std::string model_path = "./models/CNN.onnx";
 
-    std::string input_blob = IMGFEAT_NET_DEFAULT_INPUT;
-    std::string output_blob = IMGFEAT_NET_DEFAULT_OUTPUT;
-    const Dims3& input_dim = Dims3(1, 64, 64);
-    uint32_t maxBatchSize = 4;
-
-    input_cvt = new imageConverter( int width = 64, int height = 64 );
+    input_cvt = new imageConverter( 64, 64 );
 
     std::string cam_sub = "/camera/depth/image_rect_raw";
     std::string img_feat_pub = "/image_features";
 
-    net = CNN::Create(prototxt_path, model_path, maxBatchSize, input_dim);
+    net = CNN::Create(prototxt_path, model_path);
 
     ros::Subscriber img_sub = n.subscribe(cam_sub, 4, depth_feat_extrac);
     ros::Publisher img_feat_pub = n.advertise<std_msgs::Float32MultiArray>(img_feat_pub, 1);
