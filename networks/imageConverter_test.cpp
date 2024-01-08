@@ -55,7 +55,9 @@ bool imageConverter::Convert( const cv::Mat &input )
     }
 
     mInputCPU = input.data;
+
 CUDA(cudaMallocHost((void**)&mInputCPU, imageFormatSize(IMAGE_GRAY8, input.cols, input.rows)));
+
 
     if ( input.cols == req_width && input.rows == req_height )
     {

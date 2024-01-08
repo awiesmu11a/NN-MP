@@ -17,22 +17,23 @@
 
 FCN* net = NULL;
 
-std::vector<float32> rel_goal;
-std::vector<float32> image_features;
-std::vector<float32> states;
+std::vector<float> rel_goal;
+std::vector<float> rel_goal_vec;
+std::vector<float> image_features;
+std::vector<float> states;
 
-std::queue<float32> car_states;
+std::queue<float> car_states;
 
 float32_t* temp = NULL;
 size_t state_buffer = 12;
 
-std::vector<float32> goal;
+std::vector<float> goal;
 
-float32 x, y, z;
-float32 q1, q2, q3, q4;
-float32 roll, pitch, yaw;
+float x, y, z;
+float q1, q2, q3, q4;
+float roll, pitch, yaw;
 
-float32 velocity, steering_angle;
+float velocity, steering_angle;
 
 Eigen::Matrix2d rot_mat;
 Eigen::Vector2d rel_goal_vec;
@@ -76,7 +77,7 @@ void state_feat_extrac( const ackermann::AckermannDriveStamped::ConstPtr& msg )
     temp = new float32_t[state_buffer];
     std::copy(car_states.begin(), car_states.end(), temp);
 
-    cudaMemcpy(net.mInputs[0].CUDA, temp, 12 * sizeof(float32), cudaMemcpyHostToDevice);
+    cudaMemcpy(net->GetInputPtr(0), temp, 12 * sizeof(float32), cudaMemcpyHostToDevice);
 
     if ( !net->Process() )
     {
@@ -86,7 +87,7 @@ void state_feat_extrac( const ackermann::AckermannDriveStamped::ConstPtr& msg )
 
     for (int i = 0; i < 64; i++)
     {
-        states.push_back(net.mOutputs[0].CPU[i]);
+        states.push_back(net->GetOutputPtr(0)[i])
     }
 
     std_msgs::Float32MultiArray feat;
@@ -156,7 +157,7 @@ int main(int argc, char **argv)
     std::string prototxt_path = "";
     std::string model_path = "/home/nvidia/NN-MP/networks/models/state_fcn.onnx";
 
-    const Dims2& states_input_dim = Dims2(12, 1);
+    const Dims3& states_input_dim = Dims3(1, 12, 1);
 
     net = FCN::Create(prototxt_path, model_path, states_input_dim);
 
@@ -172,8 +173,6 @@ int main(int argc, char **argv)
     ros::Publisher feat_pub_node = nh.advertise<std_msgs::Float32MultiArray>(features, 4);
 
     ros::spin();
-
-    // free resources from CUDA
 
     delete net;
     delete temp;

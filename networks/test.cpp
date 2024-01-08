@@ -8,12 +8,8 @@
 
 #include "imageConverter_test.h"
 #include "CNN.h"
-//#include "FCN.h"
+#include "FCN.h"
 
-// modify image converter to fit the openCV format
-// change the format of the input in header file for FCN
-// Current file only for Grayscale images
-// Write the script such that we test for batchsize 4 (use the same image)
 
 bool CNN_test(const char* input) 
 {
@@ -34,8 +30,8 @@ const Dims3& input_dim= Dims3(1, 64, 64);
 const char* input_blob = "input";
 
 
-    CNN* net = CNN::Create( prototxt_path, model_path, maxBatchSize, input_dim, input_blob );
 
+    CNN* net = CNN::Create( prototxt_path, model_path, maxBatchSize, input_dim, input_blob );
     size_t offset = input_cvt->GetInputSize();
 
     for( int i = 0; i < 4; i++ )
@@ -49,6 +45,7 @@ const char* input_blob = "input";
         return false;
     }
 
+
     printf("Got a feature vector of size %u \n", net->GetOutputSize(0));
 
     delete net;
@@ -58,7 +55,7 @@ const char* input_blob = "input";
 
     return true;
 }
-/*
+
 std::vector<std::vector<float>> extract_csv(const char* input)
 {
     std::ifstream file(input);
@@ -95,15 +92,13 @@ std::vector<std::vector<float>> extract_csv(const char* input)
 bool FCN_test(const char* input) 
 {
     std::vector<std::vector<float>> data = extract_csv(input);
-    const Dims2& input_dim = Dims2(data.size(), data[0].size());
+    const Dims3& input_dim = Dims3(1, data.size(), data[0].size());
     uint8_t input_size = data.size() * data[0].size() * sizeof(float);
 
     const char* prototxt_path = "";
     const char* model_path = "./models/FCN.onnx";
 
     FCN* net = FCN::Create( prototxt_path, model_path, input_dim );
-
-    cudaMalloc( &net->GetInputPtr(0), input_size );
 
     cudaMemcpy( net->GetInputPtr(0), data, input_size, cudaMemcpyHostToDevice );
 
@@ -113,18 +108,16 @@ bool FCN_test(const char* input)
         return false;
     }
 
-    float* output = net.mOutputs[0].CPU;
-    printf("Got a feature vector of size %zu", output.size());
+    printf("Got a feature vector of size %u", net->GetOutputSize(0));
 
     delete net;
     delete[] prototxt_path;
     delete[] model_path;
-    delete output;
     data.clear();
 
     return true;
 }
-*/
+
 int main (int argc, char** argv)
 {
     const char* input=argv[1];
@@ -151,19 +144,22 @@ int main (int argc, char** argv)
             return 0;
         }
 
+
     //}
 /*
+
     if (argv[2] == "-v")
     {
         input = argv[1];
         if ( !FCN_test(input) )
         {
             printf("Failed to process FCN");
-            delete[] input;
             return 0;
         }
     }
+
 */
+
 
     return 0;
 
