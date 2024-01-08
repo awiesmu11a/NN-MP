@@ -20,16 +20,11 @@ class imageConverter
         bool Resize ( uint8_t width, uint8_t height, const cv::Mat &input );
 
         bool cudaAssign( uint8_t width, uint8_t height, const cv::Mat &input );
-
-        inline size_t GetInputSize() const { return mInputSize; }
-
-        inline float32_t* GetOutputGPU() const { return mOutputGPU; }
-
-        inline uint8_t* GetInputGPU() const { return mInputGPU; }
-
-        inline float32_t* GetOutputCPU() const { return mOutputCPU; }
-
-        inline uint8_t* GetInputCPU() const { return mInputCPU; }
+inline size_t GetInputSize() const {return mInputSize;}
+inline float32_t* GetOutputGPU() const {return mOutputGPU;}
+inline uint8_t* GetInputGPU() const {return mInputGPU;}
+inline float32_t* GetOutputCPU() const {return mOutputCPU;}
+inline uint8_t* GetInputCPU() const {return mInputCPU;}
     
     private:
     

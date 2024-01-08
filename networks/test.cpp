@@ -28,11 +28,13 @@ bool CNN_test(const char* input)
     }
 
     const char* prototxt_path = "";
-    const char* model_path = "./models/CNN.onnx";
+    const char* model_path = "/home/nvidia/NN-MP/networks/models/CNN.onnx";
+ uint32_t maxBatchSize = 4;
+const Dims3& input_dim= Dims3(1, 64, 64);
+const char* input_blob = "input";
 
-    CNN* net = CNN::Create( prototxt_path, model_path );
 
-    cudaMalloc( &net->GetInputPtr(0), input_cvt->GetInputSize() * 4 );
+    CNN* net = CNN::Create( prototxt_path, model_path, maxBatchSize, input_dim, input_blob );
 
     size_t offset = input_cvt->GetInputSize();
 
@@ -47,14 +49,12 @@ bool CNN_test(const char* input)
         return false;
     }
 
-    float* output = net->GetOutputPtr(0);
-    printf("Got a feature vector of size %zu", output.size());
+    printf("Got a feature vector of size %u \n", net->GetOutputSize(0));
 
     delete net;
-    delete input_cvt;
-    delete[] prototxt_path;
-    delete[] model_path;
-    delete output;
+   delete input_cvt;
+  delete[] prototxt_path;
+   delete[] model_path;
 
     return true;
 }
@@ -127,7 +127,9 @@ bool FCN_test(const char* input)
 */
 int main (int argc, char** argv)
 {
-    const char* input;
+    const char* input=argv[1];
+
+/*
     if ( argc < 1) {
         printf("Please provide an input to process");
         return 0;
@@ -139,18 +141,17 @@ int main (int argc, char** argv)
         printf("-v for vector \n");
         return 0;
     }
+*/
+  //  if (argv[2] == "1")
+    //{
 
-    if (argv[2] == "-i")
-    {
-        input = argv[1];
         if ( !CNN_test(input) )
         {
             printf("Failed to process CNN");
-            delete[] input;
             return 0;
         }
 
-    }
+    //}
 /*
     if (argv[2] == "-v")
     {
@@ -163,7 +164,6 @@ int main (int argc, char** argv)
         }
     }
 */
-    delete[] input;
 
     return 0;
 

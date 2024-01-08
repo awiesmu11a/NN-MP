@@ -139,7 +139,7 @@ endif()
 
 if(HAS_OPENCV) 
    message("-- linking CNN-test with OpenCV " ${OpenCV_VERSION})
-   target_link_libraries(NN-MP opencv_core opencv_calib3d)
+   target_link_libraries(NN-MP opencv_core opencv_calib3d opencv_imgcodecs)
 endif()
 
 if(HAS_VPI) 
@@ -159,7 +159,7 @@ endforeach()
 # install the shared library
 install(TARGETS NN-MP DESTINATION lib EXPORT NN-MPConfig)
 
-cuda_add_executable(test_model ${PROJECT_SOURCE_DIR}/NN-MP/test.cpp)
+cuda_add_executable(test_model ${PROJECT_SOURCE_DIR}/networks/test.cpp)
 target_link_libraries(test_model NN-MP)
 
 install(TARGETS test_model DESTINATION bin)

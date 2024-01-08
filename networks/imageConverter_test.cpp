@@ -48,19 +48,20 @@ void imageConverter::Free()
 
 bool imageConverter::Convert( const cv::Mat &input )
 {
-    if ( !input.empty() )
+    if ( input.empty() )
     {
         printf("Invalid image input");
         return false;
     }
 
     mInputCPU = input.data;
+CUDA(cudaMallocHost((void**)&mInputCPU, imageFormatSize(IMAGE_GRAY8, input.cols, input.rows)));
 
     if ( input.cols == req_width && input.rows == req_height )
     {
-        printf("Image size is as required so no conversion needed");
+        printf("Image size is as required so no conversion needed\n");
 
-        std::memcpy(mOutputCPU, mInputCPU, imageFormatSize(IMAGE_GRAY8, input.cols, input.rows));
+        cudaMemcpy(mOutputCPU, mInputCPU, imageFormatSize(IMAGE_GRAY8, input.cols, input.rows), cudaMemcpyHostToHost);
 
         cudaAllocMapped( (void**)&mInputCPU, (void**)&mInputGPU,
                         imageFormatSize(IMAGE_GRAY8, input.cols, input.rows) );
@@ -74,13 +75,13 @@ bool imageConverter::Convert( const cv::Mat &input )
     }
 
     if ( !cudaAssign( req_width, req_height, input ) ) { return false; }
-
     if ( !Resize( req_width, req_height, input ) )
     {
         printf("Image size is not as required and resizing failed");
         return false;
     }
 
+printf("%d", input.cols);
     return true;
 
 }

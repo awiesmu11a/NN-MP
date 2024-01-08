@@ -1284,6 +1284,7 @@ bool tensorNet::LoadNetwork( const char* prototxt_path_, const char* model_path_
 	}
 
 	LogSuccess(LOG_TRT "device %s, loaded %s\n", deviceTypeToStr(device), model_path.c_str());
+printf("%s", input_blobs[0].c_str());
 	
 
 	/*

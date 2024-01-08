@@ -4,7 +4,7 @@
 
 #include "tensorNet.h"
 
-#define IMGFEAT_NET_DEFAULT_INPUT   "images"
+#define IMGFEAT_NET_DEFAULT_INPUT   "input_0"
 
 #define IMGFEAT_NET_DEFAULT_OUTPUT  "output"
 
