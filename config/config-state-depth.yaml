@@ -1,0 +1,14 @@
+img_shape : [64, 64]
+model_path : "/home/nvidia/NN-MP/networks/models/CNN.onnx"
+img_input : [4, 64, 64]
+state_input : [1, 576, 1]
+depth_topic : "/camera/depth/image_rect_raw"
+img_feat_topic : "/image_features"
+img_node : "ImageFeatureExtractor"
+odom_sub : "/vesc/odom"
+cmd_sub : "/vesc/low_level/ackermann_cmd_mux/output"
+feat_final : "/ExtractedFeatures"
+state_node : "FeatureExtractor"
+control : "/vesc/low_level/ackermann_cmd_mux/input/teleop"
+control_sub : "/vesc/low_level/ackermann_cmd_mux/output"
+actor_node : "Actor"

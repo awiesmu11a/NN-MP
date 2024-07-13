@@ -13,3 +13,5 @@
 * Now can make a final framework for ROS interface which can be deployed directly on the car.
 * Here also add a config file for the model path, input shapes, any other resizing, topic and node names. 
 * Create a common config file.
+* Scaling is left to do. Think about this. All the variables in the main is done.
+* Make the resizing general for all the images.
